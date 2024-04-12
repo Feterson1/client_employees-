@@ -13,6 +13,7 @@ import { CurrentPostPage } from "./pages/current-post/currentPost"
 import { UserProfilePage } from "./pages/user-profile/userProfile"
 import { FollowersPage } from "./pages/followers/followers"
 import { FollowingPage } from "./pages/following/following"
+import { AuthGuard } from "./features/user/authGuard"
 
 const container = document.getElementById("root")
 const router = createBrowserRouter([
@@ -56,7 +57,9 @@ if (container) {
       <Provider store={store}>
         <NextUIProvider>
           <ThemeProvider>
-            <RouterProvider router={router} />
+            <AuthGuard>
+              <RouterProvider router={router} />
+            </AuthGuard>
           </ThemeProvider>
         </NextUIProvider>
       </Provider>

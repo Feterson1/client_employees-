@@ -1,10 +1,21 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Header } from "../header/header"
 import { Container } from "../container/container"
 import { NavBar } from "../navbar/navbar"
-import { Outlet } from "react-router-dom"
+import { Outlet, useNavigate } from "react-router-dom"
+import { selectIAuthnticated, selectUser } from "../../features/user/userSlice"
+import { useSelector } from "react-redux"
 
 export const Layout = () => {
+  const isAuth = useSelector(selectIAuthnticated)
+  const user = useSelector(selectUser)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!isAuth) {
+      navigate("/auth")
+    }
+  }, [])
   return (
     <>
       <Header />
