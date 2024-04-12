@@ -5,6 +5,7 @@ import { NavBar } from "../navbar/navbar"
 import { Outlet, useNavigate } from "react-router-dom"
 import { selectIAuthnticated, selectUser } from "../../features/user/userSlice"
 import { useSelector } from "react-redux"
+import { ProfileComponent } from "../profile/profile"
 
 export const Layout = () => {
   const isAuth = useSelector(selectIAuthnticated)
@@ -26,7 +27,11 @@ export const Layout = () => {
         <div className="flex-1 p=4">
           <Outlet />
         </div>
-        <div>.....</div>
+        <div className="flex-2 p-4">
+          <div className="flex-col flex gap-5">
+            {!user && <ProfileComponent />}
+          </div>
+        </div>
       </Container>
     </>
   )
