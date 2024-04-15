@@ -5,7 +5,7 @@ import { Card } from "../../components/card/card"
 
 export const PostsPage = () => {
   const { data } = useGetAllPostsQuery()
-
+  console.log(data)
   return (
     <>
       <div className="mb-10 w-full">

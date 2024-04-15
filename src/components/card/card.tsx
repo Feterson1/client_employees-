@@ -17,7 +17,7 @@ import {
 } from "../../app/services/postApi"
 import { useDeleteCommentMutation } from "../../app/services/commentsApi"
 import { Link, useNavigate } from "react-router-dom"
-import { selectUser } from "../../features/user/userSlice"
+import { selectCurrent } from "../../features/user/userSlice"
 import { useSelector } from "react-redux"
 import { UserComponent } from "../user/user"
 import { formatToClientDate } from "../../utils/format-to-client-date"
@@ -28,6 +28,7 @@ import { FcDislike } from "react-icons/fc"
 import { MdOutlineFavoriteBorder } from "react-icons/md"
 import { FaRegComment } from "react-icons/fa"
 import { ErrorMessage } from "../error-message/errorMessage"
+import { hasErrorField } from "../../utils/has-error-field"
 
 type Props = {
   avatarUrl: string
@@ -48,14 +49,15 @@ export const Card: React.FC<Props> = ({
   name = "",
   authorId = "",
   content = "",
-  commentId = "",
   likesCount = 0,
   commentsCount = 0,
   createdAt = Date,
   id = "",
   cardFor = "post",
-  likedByUser = false,
+  likedByUser,
+  commentId = "",
 }) => {
+  console.log(likedByUser)
   const [likePost] = useLikePostMutation()
   const [unlikePost] = useUnlikePostMutation()
   const [triggerGetAllPosts] = useLazyGetAllPostsQuery()
@@ -64,7 +66,66 @@ export const Card: React.FC<Props> = ({
   const [deleteComment, deleteCommentStatus] = useDeleteCommentMutation()
   const [error, setError] = useState("")
   const navigate = useNavigate()
-  const currentUser = useSelector(selectUser)
+  const currentUser = useSelector(selectCurrent)
+  const refetchPosts = async () => {
+    switch (cardFor) {
+      case "post":
+        await triggerGetAllPosts().unwrap()
+        break
+      case "current-post":
+        await triggerGetAllPosts().unwrap()
+        break
+      case "comment":
+        await triggerGetPostById(id).unwrap()
+        break
+      default:
+        throw new Error("Неверный аргумент cardFor")
+    }
+  }
+
+  const handleDelete = async () => {
+    try {
+      switch (cardFor) {
+        case "post":
+          await deletePost(id).unwrap()
+          await refetchPosts()
+          break
+        case "current-post":
+          await deletePost(id).unwrap()
+          navigate("/")
+          break
+        case "comment":
+          await deleteComment(id).unwrap()
+          await refetchPosts()
+          break
+        default:
+          throw new Error("Неверный аргумент cardFor")
+      }
+    } catch (error) {
+      if (hasErrorField(error)) {
+        setError(error.data.error)
+      } else {
+        setError(error as string)
+      }
+    }
+  }
+
+  const handleClick = async () => {
+    try {
+      console.log(likedByUser)
+      likedByUser
+        ? await unlikePost(id).unwrap()
+        : await likePost({ postId: id }).unwrap()
+      await refetchPosts()
+    } catch (error) {
+      if (hasErrorField(error)) {
+        setError(error.data.error)
+      } else {
+        setError(error as string)
+      }
+    }
+  }
+
   return (
     <NextUiCard className="mb-5">
       <CardHeader className="justify-between items-center bg-transparent">
@@ -77,7 +138,7 @@ export const Card: React.FC<Props> = ({
           />
         </Link>
         {authorId === currentUser?.id && (
-          <div className="cursor-pointer">
+          <div className="cursor-pointer" onClick={handleDelete}>
             {deletePostStatus.isLoading || deleteCommentStatus.isLoading ? (
               <Spinner />
             ) : (
@@ -92,7 +153,7 @@ export const Card: React.FC<Props> = ({
       {cardFor !== "comment" && (
         <CardFooter className="gap-3">
           <div className="flex gap-5 items-center">
-            <div>
+            <div onClick={handleClick}>
               <MetaInfo
                 count={likesCount}
                 Icon={likedByUser ? FcDislike : MdOutlineFavoriteBorder}
