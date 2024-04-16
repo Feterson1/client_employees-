@@ -1,11 +1,11 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { useGetAllPostsQuery } from "../../app/services/postApi"
 import { CreatePostComponent } from "../../components/create-post/createPost"
 import { Card } from "../../components/card/card"
 
 export const PostsPage = () => {
   const { data } = useGetAllPostsQuery()
-  console.log(data)
+  useEffect(() => {}, [data])
   return (
     <>
       <div className="mb-10 w-full">

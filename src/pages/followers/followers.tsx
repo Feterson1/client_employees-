@@ -1,5 +1,32 @@
 import React from "react"
+import { useSelector } from "react-redux"
+import { selectCurrent } from "../../features/user/userSlice"
+import { Link } from "react-router-dom"
+import { Card, CardBody } from "@nextui-org/react"
+import { UserComponent } from "../../components/user/user"
 
 export const FollowersPage = () => {
-  return <div>followers</div>
+  const currentUser = useSelector(selectCurrent)
+  if (!currentUser) {
+    return null
+  }
+  return currentUser.followers.length > 0 ? (
+    <div className="gap-5 flex flex-col">
+      {currentUser.followers.map(user => (
+        <Link to={`/users/${user.followerId}`} key={user.followerId}>
+          <Card>
+            <CardBody className="block">
+              <UserComponent
+                name={user.follower.name ?? ""}
+                avatarUrl={user.follower.avatarUrl ?? ""}
+                description={user.follower.bio ?? ""}
+              />
+            </CardBody>
+          </Card>
+        </Link>
+      ))}
+    </div>
+  ) : (
+    <h2>У вас нет подписчиков</h2>
+  )
 }
