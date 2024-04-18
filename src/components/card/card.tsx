@@ -72,8 +72,8 @@ export const Card: React.FC<Props> = ({
         await triggerGetAllPosts().unwrap()
         break
       case "current-post":
-        // await triggerGetAllPosts().unwrap()
-        await triggerGetPostById(id).unwrap()
+        await triggerGetAllPosts().unwrap()
+
         break
       case "comment":
         await triggerGetPostById(id).unwrap()
@@ -116,6 +116,12 @@ export const Card: React.FC<Props> = ({
       likedByUser
         ? await unlikePost(id).unwrap()
         : await likePost({ postId: id }).unwrap()
+      if (cardFor === "current-post") {
+        await triggerGetPostById(id).unwrap()
+      }
+      if (cardFor === "post") {
+        await triggerGetAllPosts().unwrap()
+      }
       await refetchPosts()
     } catch (error) {
       if (hasErrorField(error)) {

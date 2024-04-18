@@ -47,16 +47,16 @@ export const Register: React.FC<Props> = ({ setSelected }) => {
     <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
       <Input
         control={control}
-        name="name"
-        label="Имя"
-        type="text"
+        name="email"
+        label="email"
+        type="email"
         required="Обязательное поле"
       />
       <Input
         control={control}
-        name="email"
-        label="email"
-        type="email"
+        name="name"
+        label="Имя"
+        type="text"
         required="Обязательное поле"
       />
       <Input
